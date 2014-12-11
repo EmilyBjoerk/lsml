@@ -15,32 +15,33 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */  
+ */
 //@formatter:on
-package lisong_mechlab.model;
+package lisong_mechlab.model.loadout;
+
+import java.util.Iterator;
+
+import lisong_mechlab.model.item.Item;
 
 /**
- * An enumeration of all the available factions.
+ * This is a glue class to get {@link Iterable}s for different types of {@link Item}s on a loadout.
  * 
  * @author Emily Björk
+ * @param <T>
+ *            A type that any {@link Item} iterated over must implement.
+ *
  */
-public enum Faction{
-   Any, InnerSphere, Clan;
+public class LoadoutIterable<T> implements Iterable<T> {
+    private final LoadoutBase<?> loadout;
+    private final Class<T>       filter;
 
-   public boolean isCompatible(Faction aFaction){
-      if( this == Any || aFaction == Any )
-         return true;
-      return this == aFaction;
-   }
+    public LoadoutIterable(LoadoutBase<?> aLoadout, Class<T> aFilter) {
+        loadout = aLoadout;
+        filter = aFilter;
+    }
 
-   /**
-    * @param aFaction
-    *           The value found in MWO data files.
-    * @return The {@link Faction} matching the MWO string value.
-    */
-   public static Faction fromMwo(String aFaction){
-      if( null == aFaction || "clan,innersphere".equals(aFaction.toLowerCase()) )
-         return Any;
-      return valueOf(aFaction);
-   }
+    @Override
+    public Iterator<T> iterator() {
+        return new LoadoutIterator<T>(loadout, filter);
+    }
 }
